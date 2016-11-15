@@ -1,1 +1,1 @@
-# 410-Boggle-Solver
+# 410-Cube-Solver

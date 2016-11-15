@@ -1,9 +1,15 @@
+import java.util.HashMap;
+
 /**
  * Created by david on 11/8/16.
  */
 class Trie {
-    private Trie[] branches = new Trie[26];
-    private boolean isWord = false;
+    private HashMap<Character, Trie> branches;
+    private char[] isWord = null;
+
+    public Trie() {
+        this.branches = new HashMap<>(4, 1);
+    }
 
     boolean isPrefix(String word) {
         return isPrefix(word.toCharArray());
@@ -17,8 +23,8 @@ class Trie {
         Trie currentLevel = this;
         for (int i = 0; i < chars.length; i++) {
             char currentLetter = chars[i];
-            if (currentLevel.branches[currentLetter - 'a'] != null) {
-                currentLevel = currentLevel.branches[currentLetter - 'a'];
+            if (currentLevel.branches.containsKey(currentLetter)) {
+                currentLevel = currentLevel.branches.get(currentLetter);
             } else {
                 return null;
             }
@@ -26,34 +32,34 @@ class Trie {
         return currentLevel;
     }
 
-    boolean isWord(String word) {
+    char[] isWord(String word) {
         return isWord(word.toCharArray());
     }
 
-    boolean isWord(char[] chars) {
+    char[] isWord(char[] chars) {
         Trie maxLevel = findMaxDepth(chars);
-        return maxLevel != null && maxLevel.isWord;
+        return (maxLevel == null) ? null : maxLevel.isWord ;
     }
 
-    void addWord(String word) {
-        addWord(word.toCharArray(), 0);
+    void addWord(String word, char[] original) {
+        addWord(word.toCharArray(), 0, original);
     }
 
-    void addWord(char[] word) {
-        addWord(word, 0);
+    void addWord(char[] word, char[] orginal) {
+        addWord(word, 0, orginal);
     }
 
-    void addWord(char[] word, int start) {
+    void addWord(char[] word, int start, char[] original) {
         if (start == word.length) {
-            isWord = true;
+            isWord = original;
         } else {
-            int firstLetter = word[start];
-            if (this.branches[firstLetter - 'a'] == null) {
+            char firstLetter = word[start];
+            if (!branches.containsKey(firstLetter)) {
                 Trie newBranch = new Trie();
-                this.branches[firstLetter - 'a'] = newBranch;
-                newBranch.addWord(word, start + 1);
+                branches.put(firstLetter, newBranch);
+                newBranch.addWord(word, start + 1, original);
             } else {
-                this.branches[firstLetter - 'a'].addWord(word, start + 1);
+                branches.get(firstLetter).addWord(word, start + 1, original);
             }
         }
     }
